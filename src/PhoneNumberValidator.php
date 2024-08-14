@@ -22,7 +22,7 @@ class PhoneNumberValidator {
     $violations = [];
 
     $country_code_length = $this->model->countryCode()['length'] ?? 0;
-    $min_chars = $this->getMinimumDigits($data['format'],
+    $min_chars = $this->getMinimumRequiredInputLength($data,
       $country_code_length,
       $data['format_has_area_code'],
       $data['format_has_country_code']
@@ -35,15 +35,18 @@ class PhoneNumberValidator {
     return $violations;
   }
 
-  private function getMinimumDigits(string $format, int $country_code_length, bool $format_has_area_code, bool $format_has_country_code): int {
-    $countable = $format;
+  private function getMinimumRequiredInputLength(array $data, int $country_code_length, bool $format_has_area_code, bool $format_has_country_code): int {
+    $countable = $data['format'];
     $countable = str_replace(['#CC#', '#c#'], '', $countable);
     $min_chars = substr_count($countable, '#');
     if ($format_has_area_code) {
       $min_chars += 3;
     }
     if ($format_has_country_code) {
-      $min_chars += $country_code_length;
+      $has_default_country_code = isset($this->model->countryCode()['default']);
+      if (!$has_default_country_code || empty($data['parsed']['country_code'])) {
+        $min_chars += $country_code_length;
+      }
     }
 
     return $min_chars;

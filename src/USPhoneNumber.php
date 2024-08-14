@@ -3,6 +3,7 @@
 
 namespace AKlump\PhoneNumber;
 
+use AKlump\PhoneNumber\Models\PhoneNumberModelInterface;
 use AKlump\PhoneNumber\Models\USPhoneNumberModel;
 use InvalidArgumentException;
 
@@ -18,10 +19,10 @@ final class USPhoneNumber {
 
   private $model;
 
-  public function __construct(int $default_area_code = NULL, string $default_format = NULL) {
+  public function __construct(int $default_area_code = NULL, string $default_format = NULL, PhoneNumberModelInterface $model = NULL) {
     $this->areaCode = $default_area_code;
     $this->format = $default_format ?? PhoneFormats::NANP;
-    $this->model = new USPhoneNumberModel();
+    $this->model = $model ?? new USPhoneNumberModel();
     $this->countryCode = $this->model->countryCode()['default'] ?? NULL;
     $this->validator = new PhoneNumberValidator($this->model);
   }

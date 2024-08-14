@@ -3,6 +3,7 @@
 
 namespace AKlump\PhoneNumber\Tests\Unit;
 
+use AKlump\PhoneNumber\Models\USPhoneNumberModel;
 use AKlump\PhoneNumber\PhoneNumberViolations;
 use AKlump\PhoneNumber\USPhoneNumber;
 use AKlump\PhoneNumber\PhoneFormats;
@@ -141,11 +142,22 @@ final class USPhoneNumberTest extends TestCase {
     $this->assertMatchesRegularExpression('#10 digit#', $violations[PhoneNumberViolations::TOO_SHORT]);
   }
 
+  public function testValidateMissingAreaCodeRequiredFindsTwoViolationsWithCorrectMessages() {
+    $phone = new USPhoneNumber();
+    $violations = $phone->validate(5551212, PhoneFormats::SMS);
+    $this->assertCount(2, $violations);
+    $this->assertMatchesRegularExpression('#3-digit#', $violations[PhoneNumberViolations::NO_AREA_CODE]);
+    $this->assertMatchesRegularExpression('#10 digit#', $violations[PhoneNumberViolations::TOO_SHORT]);
+  }
+
   public function dataFortestValidateTooShortReturnsExpectedViolationsProvider() {
     $tests = [];
     $tests[] = [551212, '###.####', '7 digit'];
     $tests[] = [551212, '#c#.###.####', '10 digit'];
-    $tests[] = [551212, '#CC#.#c#.###.####', '11 digit'];
+
+    // Why is this also 10 digit; it's because our module has a default value
+    // for the country code, so that digit is not required.
+    $tests[] = [551212, '#CC#.#c#.###.####', '10 digit'];
 
     return $tests;
   }
@@ -166,6 +178,28 @@ final class USPhoneNumberTest extends TestCase {
     $this->assertNotEmpty($violations);
     $violations = $phone->validate('5551212');
     $this->assertEmpty($violations);
+  }
+
+  public function testCorrectDigitRequirementBasedOnModel() {
+    $violations = (new USPhoneNumber(NULL, PhoneFormats::NANP, new USPhoneNumberModel()))->validate('5551212');
+    $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]);
+    $violations = (new USPhoneNumber(NULL, PhoneFormats::SMS, new USPhoneNumberModel()))->validate('5551212');
+    $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]);
+  }
+
+  public function testCorrectDigitRequirementBasedOnModelWithoutDefaultCountryCode() {
+    $violations = (new USPhoneNumber(NULL, PhoneFormats::NANP, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
+    $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]);
+    $violations = (new USPhoneNumber(NULL, PhoneFormats::SMS, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
+    $this->assertMatchesRegularExpression('/11 digit/', $violations[PhoneNumberViolations::TOO_SHORT]);
+  }
+
+}
+
+class USPhoneNumberModelNoDefaultCountryCode extends USPhoneNumberModel {
+
+  public function countryCode(): array {
+    return ['length' => 1];
   }
 
 }
