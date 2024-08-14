@@ -1,5 +1,9 @@
 # Phone Number
 
+A lean, non-dependency PHP library to work with phone numbers.
+
+![aklump/phone-number](images/aklump_phone_number.jpg)
+
 ## Install with Composer
 
 1. Because this is an unpublished package, you must define it's repository in
@@ -15,27 +19,27 @@
 1. Require this package:
    
     ```
-    composer require aklump/phone-number:@dev
+    composer require aklump/phone-number:^0.0
     ```
 
 ## Usage
 
 ```php
-$default_area_code = 503;
-$formatter = (new \AKlump\PhoneNumber\FormatUSPhoneNumber($default_area_code);
+$default_area_code = 360;
+$format = (new \AKlump\PhoneNumber\FormatUSPhoneNumber($default_area_code);
 
-$formatted = $formatter('8881223');
-// '(503) 888-1223' === $formatted
+$number = $format('8881223');
+// '(360) 888-1223' === $formatted
 
-$formatted = $formatter('888-1223', \AKlump\PhoneNumber\PhoneFormats::SMS);
-// '+15038881223' === $formatted
+$number = $format('888-1223', \AKlump\PhoneNumber\PhoneFormats::SMS);
+// '+13608881223' === $number
 
 // Provide a custom default format.
-$formatter = (new \AKlump\PhoneNumber\FormatUSPhoneNumber(503, '+#CC#.#c#.###.####');
-$formatted = $formatter('888-1223');
-// '+1.503.888.1223' === $formatted
+$format = (new \AKlump\PhoneNumber\FormatUSPhoneNumber(360, '+#CC#.#c#.###.####');
+$number = $format('888-1223');
+// '+1.360.888.1223' === $number
 ```
 
-## International Numbers
+## International Phone Numbers
 
 See [this project](https://github.com/dmamontov/phone-normalizer/tree/master)

@@ -5,6 +5,10 @@ tags: ''
 
 # Phone Number
 
+A lean, non-dependency PHP library to work with phone numbers.
+
+![aklump/phone-number](../../images/aklump_phone_number.jpg)
+
 {{ composer.install|raw }}
 
 ## Usage
