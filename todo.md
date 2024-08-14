@@ -1,2 +1,1 @@
-- validate if too long
 - validate if country code != value
