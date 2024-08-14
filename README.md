@@ -1,6 +1,6 @@
 # Phone Number
 
-A lean, non-dependency PHP library to work with phone numbers. The focus of the library is on U.S. phone numbers only at this time. To work with international phone numbers you might try [Phone Normalizer](Phone Normalizer), from which we've taken the same formatting strategy. (Thank you, [dmamontov](https://github.com/dmamontov) and [1on](https://github.com/1on).)
+A lean, non-dependency PHP library to work with phone numbers. The focus of the library is on U.S. phone numbers only at this time. To work with international phone numbers you might try [Phone Normalizer](https://github.com/aklump/phone-number), from which we've taken the same formatting strategy. (Thank you, [dmamontov](https://github.com/dmamontov) and [1on](https://github.com/1on).)
 
 ![aklump/phone-number](images/aklump_phone_number.jpg)
 
