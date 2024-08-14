@@ -1,0 +1,25 @@
+{
+  "name": "aklump/phone-number",
+  "description": "{{ description }}",
+  "homepage": "https://github.com/aklump/phone-number",
+  "authors": [
+    {
+      "name": "Aaron Klump",
+      "homepage": "http://www.intheloftstudios.com",
+      "role": "Senior Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "AKlump\\PhoneNumber\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AKlump\\PhoneNumber\\Tests\\Unit\\": "./tests_unit"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6"
+  }
+}
