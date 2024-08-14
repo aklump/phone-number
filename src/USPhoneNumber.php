@@ -42,6 +42,12 @@ final class USPhoneNumber {
     return $this->validator->validate($data);
   }
 
+  public function isValid(string $number, string $format = NULL): bool {
+    $violations = $this->validate($number, $format);
+
+    return empty($violations);
+  }
+
   /**
    * Format a US phone number
    *

@@ -18,6 +18,46 @@ use PHPUnit\Framework\TestCase;
  */
 final class USPhoneNumberTest extends TestCase {
 
+  public function dataFortestIsValidReturnsTrueProvider() {
+    $tests = [];
+    $tests[] = [3605551212];
+    $tests[] = [5551212, '###.####'];
+    $tests[] = [1212, '####'];
+
+    return $tests;
+  }
+
+  /**
+   * @dataProvider dataFortestIsValidReturnsTrueProvider
+   */
+  public function testIsValidReturnsTrue() {
+    $phone = new USPhoneNumber();
+    $this->assertTrue(call_user_func_array([
+      $phone,
+      'isValid',
+    ], func_get_args()));
+  }
+
+  public function dataFortestIsValidReturnsFalseProvider() {
+    $tests = [];
+    $tests[] = [605551212];
+    $tests[] = [551212, '###.####'];
+    $tests[] = [212, '####'];
+
+    return $tests;
+  }
+
+  /**
+   * @dataProvider dataFortestIsValidReturnsFalseProvider
+   */
+  public function testIsValidReturnsFalse() {
+    $phone = new USPhoneNumber();
+    $this->assertFalse(call_user_func_array([
+      $phone,
+      'isValid',
+    ], func_get_args()));
+  }
+
   public function dataFortestInvokeProvider() {
     $tests = [];
     $tests[] = [
