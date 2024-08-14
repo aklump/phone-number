@@ -6,13 +6,15 @@ namespace AKlump\PhoneNumber;
 use AKlump\PhoneNumber\Models\USPhoneNumberModel;
 use InvalidArgumentException;
 
-class USPhoneNumber {
+final class USPhoneNumber {
 
   private $areaCode;
 
   private $countryCode;
 
   private $format;
+
+  private $validator;
 
   private $model;
 
@@ -21,6 +23,7 @@ class USPhoneNumber {
     $this->format = $default_format ?? PhoneFormats::NANP;
     $this->model = new USPhoneNumberModel();
     $this->countryCode = $this->model->countryCode()['default'] ?? NULL;
+    $this->validator = new PhoneNumberValidator($this->model);
   }
 
   /**
@@ -35,7 +38,7 @@ class USPhoneNumber {
   public function validate(string $number, string $format = NULL): array {
     $data = $this->prepareData($number, $format);
 
-    return $this->getViolations($data);
+    return $this->validator->validate($data);
   }
 
   /**
@@ -57,7 +60,7 @@ class USPhoneNumber {
    */
   public function format(string $number, string $format = NULL): string {
     $data = $this->prepareData($number, $format);
-    $violations = $this->getViolations($data);
+    $violations = $this->validator->validate($data);
     if (isset($violations[PhoneNumberViolations::NO_AREA_CODE])) {
       throw new InvalidArgumentException("Invalid US phone number.");
     }
@@ -66,40 +69,8 @@ class USPhoneNumber {
     $formatted = str_replace('#CC#', $data['parsed']['country_code'] ?? '#CC#', $formatted);
     $formatted = str_replace('#c#', $data['parsed']['area_code'] ?? '#c#', $formatted);
     $formatted = preg_replace('/####([^#]*$)/', ($data['parsed']['subscriber_number'] ?? '####') . '$1', $formatted, 1);
-    $formatted = preg_replace('/###/', $data['parsed']['local_exchange'] ?? '###', $formatted, 1);
 
-    return $formatted;
-  }
-
-  private function getViolations(array $data): array {
-    $violations = [];
-    if ($data['format_has_area_code'] && empty($data['parsed']['area_code'])) {
-      $violations[PhoneNumberViolations::NO_AREA_CODE] = sprintf(PhoneNumberViolations::NO_AREA_CODE_MESSAGE, 3);
-    }
-    if ($data['format_has_country_code'] && empty($data['parsed']['country_code'])) {
-      $violations[PhoneNumberViolations::NO_COUNTRY_CODE] = PhoneNumberViolations::NO_COUNTRY_CODE_MESSAGE;
-    }
-
-    $min_chars = $this->getMinimumDigits($data['format'], $data['format_has_area_code'], $data['format_has_country_code']);
-    if (strlen($data['digits_only']) < $min_chars) {
-      $violations[PhoneNumberViolations::TOO_SHORT] = sprintf(PhoneNumberViolations::TOO_SHORT_MESSAGE, $min_chars);
-    }
-
-    return $violations;
-  }
-
-  private function getMinimumDigits(string $format, bool $format_has_area_code, bool $format_has_country_code): int {
-    $foo = $format;
-    $foo = str_replace(['#CC#', '#c#'], '', $foo);
-    $min_chars = substr_count($foo, '#');
-    if ($format_has_area_code) {
-      $min_chars += 3;
-    }
-    if ($format_has_country_code) {
-      $min_chars += strlen($this->countryCode);
-    }
-
-    return $min_chars;
+    return preg_replace('/###/', $data['parsed']['local_exchange'] ?? '###', $formatted, 1);
   }
 
   private function prepareData(string $number, ?string $format): array {
@@ -120,7 +91,6 @@ class USPhoneNumber {
 
     return $data;
   }
-
 
   private function fillInWithDefaults(array &$parsed, bool $format_has_area_code, bool $format_has_country_code) {
     if ($format_has_area_code && empty($parsed['area_code'])) {
