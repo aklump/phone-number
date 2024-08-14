@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
  * @covers \AKlump\PhoneNumber\USPhoneNumber
  * @uses   \AKlump\PhoneNumber\Models\USPhoneNumberModel
  * @uses   \AKlump\PhoneNumber\PhoneNumberValidator
+ * @uses   \AKlump\PhoneNumber\Violation
  */
 final class USPhoneNumberTest extends TestCase {
 
@@ -138,16 +139,16 @@ final class USPhoneNumberTest extends TestCase {
     $phone = new USPhoneNumber();
     $violations = $phone->validate(5551212, PhoneFormats::NANP);
     $this->assertCount(2, $violations);
-    $this->assertMatchesRegularExpression('#3-digit#', $violations[PhoneNumberViolations::NO_AREA_CODE]);
-    $this->assertMatchesRegularExpression('#10 digit#', $violations[PhoneNumberViolations::TOO_SHORT]);
+    $this->assertMatchesRegularExpression('#3-digit#', $violations[PhoneNumberViolations::NO_AREA_CODE]->getMessage());
+    $this->assertMatchesRegularExpression('#10 digit#', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 
   public function testValidateMissingAreaCodeRequiredFindsTwoViolationsWithCorrectMessages() {
     $phone = new USPhoneNumber();
     $violations = $phone->validate(5551212, PhoneFormats::SMS);
     $this->assertCount(2, $violations);
-    $this->assertMatchesRegularExpression('#3-digit#', $violations[PhoneNumberViolations::NO_AREA_CODE]);
-    $this->assertMatchesRegularExpression('#10 digit#', $violations[PhoneNumberViolations::TOO_SHORT]);
+    $this->assertMatchesRegularExpression('#3-digit#', $violations[PhoneNumberViolations::NO_AREA_CODE]->getMessage());
+    $this->assertMatchesRegularExpression('#10 digit#', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 
   public function dataFortestValidateTooShortReturnsExpectedViolationsProvider() {
@@ -169,7 +170,7 @@ final class USPhoneNumberTest extends TestCase {
     $phone = new USPhoneNumber();
     $violations = $phone->validate($number, $format);
     $this->assertGreaterThanOrEqual(1, count($violations));
-    $this->assertMatchesRegularExpression('/' . $pattern . '/', $violations[PhoneNumberViolations::TOO_SHORT]);
+    $this->assertMatchesRegularExpression('/' . $pattern . '/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 
   public function testValidateResetsViolationsOnSubsequentCalls() {
@@ -182,16 +183,16 @@ final class USPhoneNumberTest extends TestCase {
 
   public function testCorrectDigitRequirementBasedOnModel() {
     $violations = (new USPhoneNumber(NULL, PhoneFormats::NANP, new USPhoneNumberModel()))->validate('5551212');
-    $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]);
+    $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
     $violations = (new USPhoneNumber(NULL, PhoneFormats::SMS, new USPhoneNumberModel()))->validate('5551212');
-    $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]);
+    $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 
   public function testCorrectDigitRequirementBasedOnModelWithoutDefaultCountryCode() {
     $violations = (new USPhoneNumber(NULL, PhoneFormats::NANP, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
-    $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]);
+    $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
     $violations = (new USPhoneNumber(NULL, PhoneFormats::SMS, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
-    $this->assertMatchesRegularExpression('/11 digit/', $violations[PhoneNumberViolations::TOO_SHORT]);
+    $this->assertMatchesRegularExpression('/11 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 
 }

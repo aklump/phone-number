@@ -61,7 +61,7 @@ class PhoneNumberValidator {
    */
   public function checkLengthViolation($digits_only, int $min_chars, array &$violations): void {
     if (strlen($digits_only) < $min_chars) {
-      $violations[PhoneNumberViolations::TOO_SHORT] = sprintf(PhoneNumberViolations::TOO_SHORT_MESSAGE, $min_chars);
+      $violations[PhoneNumberViolations::TOO_SHORT] = new Violation(sprintf(PhoneNumberViolations::TOO_SHORT_MESSAGE, $min_chars));
     }
   }
 
@@ -75,7 +75,7 @@ class PhoneNumberValidator {
     if ($data['format_has_area_code']
       && ($area_code_length = $this->model->areaCode()['length'] ?? 0)
       && empty($data['parsed']['area_code'])) {
-      $violations[PhoneNumberViolations::NO_AREA_CODE] = sprintf(PhoneNumberViolations::NO_AREA_CODE_MESSAGE, $area_code_length);
+      $violations[PhoneNumberViolations::NO_AREA_CODE] = new Violation(sprintf(PhoneNumberViolations::NO_AREA_CODE_MESSAGE, $area_code_length));
     }
   }
 
@@ -89,7 +89,7 @@ class PhoneNumberValidator {
   public function checkCountryCodeViolation(array $data, $country_code_length, array &$violations): void {
     if ($data['format_has_country_code']
       && empty($data['parsed']['country_code'])) {
-      $violations[PhoneNumberViolations::NO_COUNTRY_CODE] = sprintf(PhoneNumberViolations::NO_COUNTRY_CODE_MESSAGE, $country_code_length);
+      $violations[PhoneNumberViolations::NO_COUNTRY_CODE] = new Violation(sprintf(PhoneNumberViolations::NO_COUNTRY_CODE_MESSAGE, $country_code_length));
     }
   }
 

@@ -33,7 +33,7 @@ final class USPhoneNumber {
    * @param string $number
    * @param string|NULL $format
    *
-   * @return array An array of any constraint violations.  If this is empty the number is valid for the format.
+   * @return \AKlump\PhoneNumber\Violation[] An array of any constraint violations.  If this is empty the number is valid for the format.
    *
    */
   public function validate(string $number, string $format = NULL): array {
