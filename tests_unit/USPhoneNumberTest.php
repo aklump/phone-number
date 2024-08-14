@@ -214,7 +214,7 @@ final class USPhoneNumberTest extends TestCase {
   }
 
   public function testValidateResetsViolationsOnSubsequentCalls() {
-    $phone = new USPhoneNumber(360);
+    $phone = new USPhoneNumber(NULL, 360);
     $violations = $phone->validate('1212');
     $this->assertNotEmpty($violations);
     $violations = $phone->validate('5551212');
@@ -222,16 +222,16 @@ final class USPhoneNumberTest extends TestCase {
   }
 
   public function testCorrectDigitRequirementBasedOnModel() {
-    $violations = (new USPhoneNumber(NULL, PhoneFormats::NANP, new USPhoneNumberModel()))->validate('5551212');
+    $violations = (new USPhoneNumber(PhoneFormats::NANP, NULL, new USPhoneNumberModel()))->validate('5551212');
     $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
-    $violations = (new USPhoneNumber(NULL, PhoneFormats::SMS, new USPhoneNumberModel()))->validate('5551212');
+    $violations = (new USPhoneNumber(PhoneFormats::SMS, NULL, new USPhoneNumberModel()))->validate('5551212');
     $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 
   public function testCorrectDigitRequirementBasedOnModelWithoutDefaultCountryCode() {
-    $violations = (new USPhoneNumber(NULL, PhoneFormats::NANP, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
+    $violations = (new USPhoneNumber(PhoneFormats::NANP, NULL, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
     $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
-    $violations = (new USPhoneNumber(NULL, PhoneFormats::SMS, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
+    $violations = (new USPhoneNumber(PhoneFormats::SMS, NULL, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
     $this->assertMatchesRegularExpression('/11 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 

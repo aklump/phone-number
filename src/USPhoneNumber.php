@@ -19,10 +19,19 @@ final class USPhoneNumber {
 
   private $model;
 
-  public function __construct(int $default_area_code = NULL, string $default_format = NULL, PhoneNumberModelInterface $model = NULL) {
+  /**
+   * Constructor method for the class.
+   *
+   * @param string|null $default_format The default phone number format. Default: NULL.
+   * @param int|null $default_area_code The default area code. Default: NULL.
+   * @param PhoneNumberModelInterface|null $phone_number_model The phone number model. Default: \AKlump\PhoneNumber\Models\USPhoneNumberModel.
+   *
+   * @return void
+   */
+  public function __construct(string $default_format = NULL, int $default_area_code = NULL, PhoneNumberModelInterface $phone_number_model = NULL) {
     $this->areaCode = $default_area_code;
     $this->format = $default_format ?? PhoneFormats::NANP;
-    $this->model = $model ?? new USPhoneNumberModel();
+    $this->model = $phone_number_model ?? new USPhoneNumberModel();
     $this->countryCode = $this->model->countryCode()['value'] ?? NULL;
     $this->validator = new PhoneNumberValidator($this->model);
   }
