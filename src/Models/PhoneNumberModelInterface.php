@@ -20,7 +20,7 @@ interface PhoneNumberModelInterface {
   public function areaCode(): array;
 
   /**
-   * @return array With the key "length".
+   * @return array With the key "length" and option"value"
    */
   public function countryCode(): array;
 }

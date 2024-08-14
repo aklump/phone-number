@@ -23,7 +23,7 @@ final class USPhoneNumber {
     $this->areaCode = $default_area_code;
     $this->format = $default_format ?? PhoneFormats::NANP;
     $this->model = $model ?? new USPhoneNumberModel();
-    $this->countryCode = $this->model->countryCode()['default'] ?? NULL;
+    $this->countryCode = $this->model->countryCode()['value'] ?? NULL;
     $this->validator = new PhoneNumberValidator($this->model);
   }
 

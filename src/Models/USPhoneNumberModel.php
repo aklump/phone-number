@@ -17,6 +17,6 @@ class USPhoneNumberModel implements PhoneNumberModelInterface {
   }
 
   public function countryCode(): array {
-    return ['length' => 1, 'default' => 1];
+    return ['length' => 1, 'value' => 1];
   }
 }
