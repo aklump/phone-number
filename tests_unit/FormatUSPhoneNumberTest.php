@@ -16,9 +16,9 @@ final class FormatUSPhoneNumberTest extends TestCase {
   public function dataFortestInvokeProvider() {
     $tests = [];
     $tests[] = [
-      '{"country":"+1","area_code":206,"local_exchange":555,"subscriber_number":1212}',
+      '{"country":"+1","areaCode":206,"localExchange":555,"subscriberNumber":1212}',
       '+1.206.555.1212',
-      '{"country":"+#CC#","area_code":#c#,"local_exchange":###,"subscriber_number":####}',
+      PhoneFormats::JSON,
     ];
     $tests[] = [
       '888.2746',

@@ -16,4 +16,6 @@ class PhoneFormats {
   const NANP = '(#c#) ###-####';
 
   const SMS = '+#CC##c########';
+
+  const JSON = '{"country":"+#CC#","areaCode":#c#,"localExchange":###,"subscriberNumber":####}';
 }
