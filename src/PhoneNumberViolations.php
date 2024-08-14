@@ -6,7 +6,7 @@ class PhoneNumberViolations {
 
   const NO_COUNTRY_CODE = 1;
 
-  const NO_COUNTRY_CODE_MESSAGE = 'The phone number is missing the country code.';
+  const NO_COUNTRY_CODE_MESSAGE = 'The phone number is missing the %d-digit country code.';
 
   const NO_AREA_CODE = 2;
 
@@ -15,4 +15,5 @@ class PhoneNumberViolations {
   const TOO_SHORT = 3;
 
   const TOO_SHORT_MESSAGE = 'The phone number must be at least %d digit(s) long.';
+
 }

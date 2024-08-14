@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers \AKlump\PhoneNumber\USPhoneNumber
  * @uses   \AKlump\PhoneNumber\Models\USPhoneNumberModel
+ * @uses   \AKlump\PhoneNumber\PhoneNumberValidator
  */
 final class USPhoneNumberTest extends TestCase {
 
