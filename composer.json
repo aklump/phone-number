@@ -1,6 +1,6 @@
 {
   "name": "aklump/phone-number",
-  "description": "{{ description }}",
+  "description": "A lean, non-dependency PHP library to work with phone numbers.",
   "homepage": "https://github.com/aklump/phone-number",
   "authors": [
     {
@@ -19,7 +19,11 @@
       "AKlump\\PhoneNumber\\Tests\\Unit\\": "./tests_unit"
     }
   },
+  "require": {
+    "php": ">=7.3"
+  },
   "require-dev": {
-    "phpunit/phpunit": "^9.6"
+    "phpunit/phpunit": "^9.6",
+    "aklump/phpswap": "^0.0.7"
   }
 }
