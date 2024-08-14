@@ -7,7 +7,7 @@ use AKlump\PhoneNumber\Models\PhoneNumberModelInterface;
 use AKlump\PhoneNumber\Models\USPhoneNumberModel;
 use InvalidArgumentException;
 
-final class USPhoneNumber {
+final class USPhoneNumberFormatter {
 
   private $areaCode;
 
@@ -30,7 +30,7 @@ final class USPhoneNumber {
    */
   public function __construct(string $default_format = NULL, int $default_area_code = NULL, PhoneNumberModelInterface $phone_number_model = NULL) {
     $this->areaCode = $default_area_code;
-    $this->format = $default_format ?? PhoneFormats::NANP;
+    $this->format = $default_format ?? PhoneNumberFormats::NANP;
     $this->model = $phone_number_model ?? new USPhoneNumberModel();
     $this->countryCode = $this->model->countryCode()['value'] ?? NULL;
     $this->validator = new PhoneNumberValidator($this->model);
@@ -71,8 +71,8 @@ final class USPhoneNumber {
    *
    * @throws \InvalidArgumentException When the number is invalid.
    *
-   * @see \AKlump\PhoneNumber\PhoneFormats
-   * @see \AKlump\PhoneNumber\USPhoneNumber::validate()
+   * @see \AKlump\PhoneNumber\PhoneNumberFormats
+   * @see \AKlump\PhoneNumber\USPhoneNumberFormatter::validate()
    */
   public function format(string $number, string $format = NULL): string {
     $data = $this->prepareData($number, $format);

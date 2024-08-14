@@ -20,12 +20,12 @@ A lean, non-dependency PHP library to work with phone numbers. The focus of the 
     * `#c#` for the area code
     * `###` (leftmost three) for the local exchange.
     * `####` (rightmost four) for subscriber number.
-* Pre-defined formats provided by `\AKlump\PhoneNumber\PhoneFormats`  
+* Pre-defined formats provided by `\AKlump\PhoneNumber\PhoneNumberFormats`  
 * Invalid phone numbers will not format, but throw an exception.
 * To obtain a list of violations for an invalid phone number use the `::validate` method.
 
 ```php
-$phone = (new \AKlump\PhoneNumber\USPhoneNumber();
+$phone = (new \AKlump\PhoneNumber\USPhoneNumberFormatter();
 $number = $phone->format('3608881223');
 // '(360) 888-1223' === $formatted
 ```
@@ -34,7 +34,7 @@ If the context of your app is regional, you maybe want to assume a default area 
 
 ```php
 $default_area_code = 360;
-$phone = (new \AKlump\PhoneNumber\USPhoneNumber($default_area_code);
+$phone = (new \AKlump\PhoneNumber\USPhoneNumberFormatter($default_area_code);
 
 $number = $phone->format('8881223');
 // '(360) 888-1223' === $formatted
@@ -43,7 +43,7 @@ $number = $phone->format('8881223');
 #### Formatted for SMS
 
 ```php
-$number = $phone->format('888-1223', \AKlump\PhoneNumber\PhoneFormats::SMS);
+$number = $phone->format('888-1223', \AKlump\PhoneNumber\PhoneNumberFormats::SMS);
 // '+13608881223' === $number
 ```
 
@@ -51,7 +51,7 @@ $number = $phone->format('888-1223', \AKlump\PhoneNumber\PhoneFormats::SMS);
 
 ```php
 // Provide a custom default format.
-$phone = (new \AKlump\PhoneNumber\USPhoneNumber(360, '+#CC#.#c#.###.####');
+$phone = (new \AKlump\PhoneNumber\USPhoneNumberFormatter(360, '+#CC#.#c#.###.####');
 $number = $phone->format('888-1223');
 // '+1.360.888.1223' === $number
 ```
@@ -60,7 +60,7 @@ $number = $phone->format('888-1223');
 
 ```php
 // Convert to a JSON string.
-$phone = (new \AKlump\PhoneNumber\USPhoneNumber(360, \AKlump\PhoneNumber\PhoneFormats::JSON);
+$phone = (new \AKlump\PhoneNumber\USPhoneNumberFormatter(360, \AKlump\PhoneNumber\PhoneNumberFormats::JSON);
 $number = $phone->format('888-1223');
 // '{"country":"+1","areaCode":206,"localExchange":555,"subscriberNumber":1212}' === $number
 ```
@@ -68,7 +68,7 @@ $number = $phone->format('888-1223');
 ### Validating Numbers
 
 ```php
-$phone = (new \AKlump\PhoneNumber\USPhoneNumber();
+$phone = (new \AKlump\PhoneNumber\USPhoneNumberFormatter();
 $violations = $phone->validate('3608881223');
 foreach($violations as $violation) {
   echo $violation;

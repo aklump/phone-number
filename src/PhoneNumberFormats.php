@@ -3,7 +3,7 @@
 
 namespace AKlump\PhoneNumber;
 
-class PhoneFormats {
+class PhoneNumberFormats {
 
   /**
    * @link https://www.itu.int/rec/T-REC-E.164/en

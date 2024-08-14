@@ -5,16 +5,16 @@ namespace AKlump\PhoneNumber\Tests\Unit;
 
 use AKlump\PhoneNumber\Models\USPhoneNumberModel;
 use AKlump\PhoneNumber\PhoneNumberViolations;
-use AKlump\PhoneNumber\USPhoneNumber;
-use AKlump\PhoneNumber\PhoneFormats;
+use AKlump\PhoneNumber\USPhoneNumberFormatter;
+use AKlump\PhoneNumber\PhoneNumberFormats;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \AKlump\PhoneNumber\USPhoneNumber
- * @uses   \AKlump\PhoneNumber\Models\USPhoneNumberModel
- * @uses   \AKlump\PhoneNumber\PhoneNumberValidator
- * @uses   \AKlump\PhoneNumber\Violation
+ * @covers   \AKlump\PhoneNumber\USPhoneNumberFormatter
+ * @covers   \AKlump\PhoneNumber\PhoneNumberValidator
+ * @covers   \AKlump\PhoneNumber\Models\USPhoneNumberModel
+ * @uses     \AKlump\PhoneNumber\Violation
  */
 final class USPhoneNumberTest extends TestCase {
 
@@ -31,7 +31,7 @@ final class USPhoneNumberTest extends TestCase {
    * @dataProvider dataFortestIsValidReturnsTrueProvider
    */
   public function testIsValidReturnsTrue() {
-    $phone = new USPhoneNumber();
+    $phone = new USPhoneNumberFormatter();
     $this->assertTrue(call_user_func_array([
       $phone,
       'isValid',
@@ -51,7 +51,7 @@ final class USPhoneNumberTest extends TestCase {
    * @dataProvider dataFortestIsValidReturnsFalseProvider
    */
   public function testIsValidReturnsFalse() {
-    $phone = new USPhoneNumber();
+    $phone = new USPhoneNumberFormatter();
     $this->assertFalse(call_user_func_array([
       $phone,
       'isValid',
@@ -63,7 +63,7 @@ final class USPhoneNumberTest extends TestCase {
     $tests[] = [
       '{"country":"+1","areaCode":206,"localExchange":555,"subscriberNumber":1212}',
       '+1.206.555.1212',
-      PhoneFormats::JSON,
+      PhoneNumberFormats::JSON,
     ];
     $tests[] = [
       '888.2746',
@@ -73,20 +73,20 @@ final class USPhoneNumberTest extends TestCase {
     $tests[] = [
       '+19715630360',
       '9715630360',
-      PhoneFormats::SMS,
+      PhoneNumberFormats::SMS,
     ];
 
     $tests[] = [
       '+15032974755',
       '5032974755',
-      PhoneFormats::SMS,
+      PhoneNumberFormats::SMS,
     ];
 
 
     $tests[] = [
       '+15032974755',
       '5032974755',
-      PhoneFormats::SMS,
+      PhoneNumberFormats::SMS,
     ];
 
     $tests[] = [
@@ -97,37 +97,37 @@ final class USPhoneNumberTest extends TestCase {
     $tests[] = [
       '(360) 888-2741',
       '360.888.2741',
-      PhoneFormats::NANP,
+      PhoneNumberFormats::NANP,
     ];
     $tests[] = [
       '(360) 888-2742',
       '3608882742',
-      PhoneFormats::NANP,
+      PhoneNumberFormats::NANP,
     ];
     $tests[] = [
       '(360) 888-2743',
       '13608882743',
-      PhoneFormats::NANP,
+      PhoneNumberFormats::NANP,
     ];
     $tests[] = [
       '(360) 888-2744',
       '+13608882744',
-      PhoneFormats::NANP,
+      PhoneNumberFormats::NANP,
     ];
     $tests[] = [
       '(360) 888-2745',
       '1.360.888.2745',
-      PhoneFormats::NANP,
+      PhoneNumberFormats::NANP,
     ];
     $tests[] = [
       '(360) 888-2746',
       '360-888-2746',
-      PhoneFormats::NANP,
+      PhoneNumberFormats::NANP,
     ];
     $tests[] = [
       '+1 360 888 2746',
       '360-888-2746',
-      PhoneFormats::E164,
+      PhoneNumberFormats::E164,
     ];
     $tests[] = [
       '(360) 888-2746',
@@ -141,12 +141,12 @@ final class USPhoneNumberTest extends TestCase {
    * @dataProvider dataFortestInvokeProvider
    */
   public function testFormat(string $expected, $subject, string $format = NULL) {
-    $this->assertSame($expected, (new USPhoneNumber())->format($subject, $format));
+    $this->assertSame($expected, (new USPhoneNumberFormatter())->format($subject, $format));
   }
 
   public function testMissingAreaCodeThrowsInvalidArgumentException() {
     $this->expectException(InvalidArgumentException::class);
-    (new USPhoneNumber())->format('888-1223', PhoneFormats::SMS);
+    (new USPhoneNumberFormatter())->format('888-1223', PhoneNumberFormats::SMS);
   }
 
   public function dataFortestValidateFindsNoViolationsProvider(): array {
@@ -155,7 +155,7 @@ final class USPhoneNumberTest extends TestCase {
     $tests[] = [5551212, '###.####'];
     $tests[] = [5551212, '####'];
     $tests[] = [3605551212, '#c#-###-####'];
-    $tests[] = [3605551212, PhoneFormats::NANP];
+    $tests[] = [3605551212, PhoneNumberFormats::NANP];
 
     return $tests;
   }
@@ -164,28 +164,28 @@ final class USPhoneNumberTest extends TestCase {
    * @dataProvider dataFortestValidateFindsNoViolationsProvider
    */
   public function testValidateFindsNoViolations($number, string $format) {
-    $phone = new USPhoneNumber();
+    $phone = new USPhoneNumberFormatter();
     $violations = $phone->validate($number, $format);
     $this->assertEmpty($violations);
   }
 
   public function testValidateMissingCountryCodeRequiredDoesNotViolateBecauseOfDefaultValueUS() {
-    $phone = new USPhoneNumber();
-    $violations = $phone->validate(3605551212, PhoneFormats::E164);
+    $phone = new USPhoneNumberFormatter();
+    $violations = $phone->validate(3605551212, PhoneNumberFormats::E164);
     $this->assertCount(0, $violations);
   }
 
   public function testValidateMissingAreaCodeRequiredFindsTwoViolations() {
-    $phone = new USPhoneNumber();
-    $violations = $phone->validate(5551212, PhoneFormats::NANP);
+    $phone = new USPhoneNumberFormatter();
+    $violations = $phone->validate(5551212, PhoneNumberFormats::NANP);
     $this->assertCount(2, $violations);
     $this->assertMatchesRegularExpression('#3-digit#', $violations[PhoneNumberViolations::NO_AREA_CODE]->getMessage());
     $this->assertMatchesRegularExpression('#10 digit#', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 
   public function testValidateMissingAreaCodeRequiredFindsTwoViolationsWithCorrectMessages() {
-    $phone = new USPhoneNumber();
-    $violations = $phone->validate(5551212, PhoneFormats::SMS);
+    $phone = new USPhoneNumberFormatter();
+    $violations = $phone->validate(5551212, PhoneNumberFormats::SMS);
     $this->assertCount(2, $violations);
     $this->assertMatchesRegularExpression('#3-digit#', $violations[PhoneNumberViolations::NO_AREA_CODE]->getMessage());
     $this->assertMatchesRegularExpression('#10 digit#', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
@@ -207,14 +207,14 @@ final class USPhoneNumberTest extends TestCase {
    * @dataProvider dataFortestValidateTooShortReturnsExpectedViolationsProvider
    */
   public function testValidateTooShortReturnsExpectedViolationMessage($number, string $format, string $pattern) {
-    $phone = new USPhoneNumber();
+    $phone = new USPhoneNumberFormatter();
     $violations = $phone->validate($number, $format);
     $this->assertGreaterThanOrEqual(1, count($violations));
     $this->assertMatchesRegularExpression('/' . $pattern . '/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 
   public function testValidateResetsViolationsOnSubsequentCalls() {
-    $phone = new USPhoneNumber(NULL, 360);
+    $phone = new USPhoneNumberFormatter(NULL, 360);
     $violations = $phone->validate('1212');
     $this->assertNotEmpty($violations);
     $violations = $phone->validate('5551212');
@@ -222,16 +222,16 @@ final class USPhoneNumberTest extends TestCase {
   }
 
   public function testCorrectDigitRequirementBasedOnModel() {
-    $violations = (new USPhoneNumber(PhoneFormats::NANP, NULL, new USPhoneNumberModel()))->validate('5551212');
+    $violations = (new USPhoneNumberFormatter(PhoneNumberFormats::NANP, NULL, new USPhoneNumberModel()))->validate('5551212');
     $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
-    $violations = (new USPhoneNumber(PhoneFormats::SMS, NULL, new USPhoneNumberModel()))->validate('5551212');
+    $violations = (new USPhoneNumberFormatter(PhoneNumberFormats::SMS, NULL, new USPhoneNumberModel()))->validate('5551212');
     $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 
   public function testCorrectDigitRequirementBasedOnModelWithoutDefaultCountryCode() {
-    $violations = (new USPhoneNumber(PhoneFormats::NANP, NULL, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
+    $violations = (new USPhoneNumberFormatter(PhoneNumberFormats::NANP, NULL, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
     $this->assertMatchesRegularExpression('/10 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
-    $violations = (new USPhoneNumber(PhoneFormats::SMS, NULL, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
+    $violations = (new USPhoneNumberFormatter(PhoneNumberFormats::SMS, NULL, new USPhoneNumberModelNoDefaultCountryCode()))->validate('5551212');
     $this->assertMatchesRegularExpression('/11 digit/', $violations[PhoneNumberViolations::TOO_SHORT]->getMessage());
   }
 
