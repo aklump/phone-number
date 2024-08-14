@@ -1,0 +1,3 @@
+- validate if too long
+- change 'default' to 'value'
+- validate if country code != value
