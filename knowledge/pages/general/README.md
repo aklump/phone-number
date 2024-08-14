@@ -13,23 +13,67 @@ A lean, non-dependency PHP library to work with phone numbers. The focus of the 
 
 ## Usage
 
+### Formatting Numbers
+
+* Tokens are:
+    * `#CC#` for the country code.
+    * `#c#` for the area code
+    * `###` (leftmost three) for the local exchange.
+    * `####` (rightmost four) for subscriber number.
+* Pre-defined formats provided by `\AKlump\PhoneNumber\PhoneFormats`  
+* Invalid phone numbers will not format, but throw an exception.
+* To obtain a list of violations for an invalid phone number use the `::validate` method.
+
+```php
+$phone = (new \AKlump\PhoneNumber\USPhoneNumber();
+$number = $phone->format('3608881223');
+// '(360) 888-1223' === $formatted
+```
+
+If the context of your app is regional, you maybe want to assume a default area code.
+
 ```php
 $default_area_code = 360;
-$format = (new \AKlump\PhoneNumber\FormatUSPhoneNumber($default_area_code);
+$phone = (new \AKlump\PhoneNumber\USPhoneNumber($default_area_code);
 
-$number = $format('8881223');
+$number = $phone->format('8881223');
 // '(360) 888-1223' === $formatted
+```
 
-$number = $format('888-1223', \AKlump\PhoneNumber\PhoneFormats::SMS);
+#### Formatted for SMS
+
+```php
+$number = $phone->format('888-1223', \AKlump\PhoneNumber\PhoneFormats::SMS);
 // '+13608881223' === $number
+```
 
+#### Using Custom Formats
+
+```php
 // Provide a custom default format.
-$format = (new \AKlump\PhoneNumber\FormatUSPhoneNumber(360, '+#CC#.#c#.###.####');
-$number = $format('888-1223');
+$phone = (new \AKlump\PhoneNumber\USPhoneNumber(360, '+#CC#.#c#.###.####');
+$number = $phone->format('888-1223');
 // '+1.360.888.1223' === $number
+```
 
+#### Outside the Box Thinking
+
+```php
 // Convert to a JSON string.
-$format = (new \AKlump\PhoneNumber\FormatUSPhoneNumber(360, \AKlump\PhoneNumber\PhoneFormats::JSON);
-$number = $format('888-1223');
+$phone = (new \AKlump\PhoneNumber\USPhoneNumber(360, \AKlump\PhoneNumber\PhoneFormats::JSON);
+$number = $phone->format('888-1223');
 // '{"country":"+1","areaCode":206,"localExchange":555,"subscriberNumber":1212}' === $number
 ```
+
+### Validating Numbers
+
+```php
+$phone = (new \AKlump\PhoneNumber\USPhoneNumber();
+$violations = $phone->validate('3608881223');
+foreach($violations as $violation) {
+  echo $violation;
+}
+$is_valid = empty($violations);
+```
+
+* See also `\AKlump\PhoneNumber\PhoneNumberViolations`
