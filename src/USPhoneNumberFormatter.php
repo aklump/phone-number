@@ -13,46 +13,50 @@ final class USPhoneNumberFormatter {
 
   private $countryCode;
 
-  private $format;
+  private $phoneNumberFormat;
+
+  private $phoneNumberModel;
 
   private $validator;
-
-  private $model;
 
   /**
    * Constructor method for the class.
    *
-   * @param string|null $default_format The default phone number format. Default: NULL.
-   * @param int|null $default_area_code The default area code. Default: NULL.
+   * @param string|NULL $format_template , e.g. '+#CC# (#c#) ###-####'
+   * - '#CC#' = country_code
+   * - '#c#' = area area_code
+   * - '###' = local_exchange (to the left)
+   * - '####' = subscriber_number (to the right)
+   * @param int|null $default_area_code Optional.  Pass this only if you want
+   * numbers missing area codes to be valid by inserted this value.
    * @param PhoneNumberModelInterface|null $phone_number_model The phone number model. Default: \AKlump\PhoneNumber\Models\USPhoneNumberModel.
    *
    * @return void
    */
-  public function __construct(string $default_format = NULL, int $default_area_code = NULL, PhoneNumberModelInterface $phone_number_model = NULL) {
+  public function __construct(string $format_template = NULL, int $default_area_code = NULL, PhoneNumberModelInterface $phone_number_model = NULL) {
     $this->areaCode = $default_area_code;
-    $this->format = $default_format ?? PhoneNumberFormats::NANP;
-    $this->model = $phone_number_model ?? new USPhoneNumberModel();
-    $this->countryCode = $this->model->countryCode()['value'] ?? NULL;
-    $this->validator = new PhoneNumberValidator($this->model);
+    $this->phoneNumberFormat = $format_template ?? PhoneNumberFormats::NANP;
+    $this->phoneNumberModel = $phone_number_model ?? new USPhoneNumberModel();
+    $this->countryCode = $this->phoneNumberModel->countryCode()['value'] ?? NULL;
+    $this->validator = new PhoneNumberValidator($this->phoneNumberModel);
   }
 
   /**
    * Validate if a number is valid for a format.
    *
    * @param string $number
-   * @param string|NULL $format
    *
    * @return \AKlump\PhoneNumber\Violation[] An array of any constraint violations.  If this is empty the number is valid for the format.
    *
    */
-  public function validate(string $number, string $format = NULL): array {
-    $data = $this->prepareData($number, $format);
+  public function validate(string $number): array {
+    $data = $this->prepareData($number);
 
     return $this->validator->validate($data);
   }
 
-  public function isValid(string $number, string $format = NULL): bool {
-    $violations = $this->validate($number, $format);
+  public function isValid(string $number): bool {
+    $violations = $this->validate($number);
 
     return empty($violations);
   }
@@ -61,11 +65,6 @@ final class USPhoneNumberFormatter {
    * Format a US phone number
    *
    * @param string $number
-   * @param string|NULL $format , e.g. '+#CC# (#c#) ###-####'
-   * - '#CC#' = country_code
-   * - '#c#' = area area_code
-   * - '###' = local_exchange (to the left)
-   * - '####' = subscriber_number (to the right)
    *
    * @return string
    *
@@ -74,27 +73,29 @@ final class USPhoneNumberFormatter {
    * @see \AKlump\PhoneNumber\PhoneNumberFormats
    * @see \AKlump\PhoneNumber\USPhoneNumberFormatter::validate()
    */
-  public function format(string $number, string $format = NULL): string {
-    $data = $this->prepareData($number, $format);
+  public function format(string $number): string {
+    $data = $this->prepareData($number);
     $violations = $this->validator->validate($data);
     if (isset($violations[PhoneNumberViolations::NO_AREA_CODE])) {
       throw new InvalidArgumentException("Invalid US phone number.");
     }
 
-    $formatted = $data['format'];
-    $formatted = str_replace('#CC#', $data['parsed']['country_code'] ?? '#CC#', $formatted);
-    $formatted = str_replace('#c#', $data['parsed']['area_code'] ?? '#c#', $formatted);
-    $formatted = preg_replace('/####([^#]*$)/', ($data['parsed']['subscriber_number'] ?? '####') . '$1', $formatted, 1);
+    $formatted = $this->serializeDataWithTokenReplacement($data);
 
     return preg_replace('/###/', $data['parsed']['local_exchange'] ?? '###', $formatted, 1);
   }
 
-  private function prepareData(string $number, ?string $format): array {
-    $data['format'] = $format ?? $this->format;
+  private function prepareData(string $number): array {
+    $data = [];
+    $data['format'] = $this->phoneNumberFormat;
     $data['format_has_area_code'] = strpos($data['format'], '#c#') !== FALSE;
     $data['format_has_country_code'] = strpos($data['format'], '#CC#') !== FALSE;
 
     $digits_only = $this->stripNonNumericChars($number);
+    $data['original'] = [
+      'number' => $number,
+      'digits_only' => $digits_only,
+    ];
     $data['parsed'] = $this->parsePhoneNumber($digits_only);
     $this->fillInWithDefaults($data['parsed'], $data['format_has_area_code'], $data['format_has_country_code']);
 
@@ -106,6 +107,15 @@ final class USPhoneNumberFormatter {
     ]);
 
     return $data;
+  }
+
+  public function serializeDataWithTokenReplacement(array $data): string {
+    $formatted = $data['format'];
+    $formatted = str_replace('#CC#', $data['parsed']['country_code'] ?? '#CC#', $formatted);
+    $formatted = str_replace('#c#', $data['parsed']['area_code'] ?? '#c#', $formatted);
+    $formatted = preg_replace('/####([^#]*$)/', ($data['parsed']['subscriber_number'] ?? '####') . '$1', $formatted, 1);
+
+    return $formatted;
   }
 
   private function fillInWithDefaults(array &$parsed, bool $format_has_area_code, bool $format_has_country_code) {
@@ -130,10 +140,10 @@ final class USPhoneNumberFormatter {
       'country_code',
     ];
     $chunk_sizes = [
-      $this->model->subscriberNumber()['length'] ?? 0,
-      $this->model->localExchange()['length'] ?? 0,
-      $this->model->areaCode()['length'] ?? 0,
-      $this->model->countryCode()['length'] ?? 0,
+      $this->phoneNumberModel->subscriberNumber()['length'] ?? 0,
+      $this->phoneNumberModel->localExchange()['length'] ?? 0,
+      $this->phoneNumberModel->areaCode()['length'] ?? 0,
+      $this->phoneNumberModel->countryCode()['length'] ?? 0,
     ];
     $result = array_fill_keys($chunk_names, NULL);
     while (strlen($temp) && $chunk_size = array_shift($chunk_sizes)) {
