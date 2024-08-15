@@ -20,6 +20,7 @@ final class USPhoneNumberTest extends TestCase {
 
   public function dataFortestIsValidReturnsTrueProvider() {
     $tests = [];
+    $tests[] = ['(971) 555-0360', PhoneNumberFormats::SMS];
     $tests[] = [3605551212];
     $tests[] = [5551212, '###.####'];
     $tests[] = [1212, '####'];
@@ -150,6 +151,7 @@ final class USPhoneNumberTest extends TestCase {
     $tests[] = [5551212, '####'];
     $tests[] = [3605551212, '#c#-###-####'];
     $tests[] = [3605551212, PhoneNumberFormats::NANP];
+    $tests[] = ['(971) 555-0360', PhoneNumberFormats::SMS];
 
     return $tests;
   }
