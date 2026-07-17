@@ -4,13 +4,19 @@ A lean, non-dependency PHP library to work with phone numbers. The focus of the 
 
 ![aklump/phone-number](images/aklump_phone_number.jpg)
 
-## Install with Composer
+##        Install with Composer
 
-1. Require this package:
+2. Require the latest stable version:
    
-    ```
-    composer require aklump/phone-number:^0.0
-    ```
+   ```shell
+   composer require aklump/phone-number:^0.0
+   ```
+3. ... or require the dev channel:
+   
+   ```shell
+   composer config minimum-stability dev
+   composer require aklump/phone-number:@dev
+   ```
 
 ## Usage
 

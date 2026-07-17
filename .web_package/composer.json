@@ -1,0 +1,16 @@
+{
+    "name": "web-package/phone-number",
+    "authors": [
+        {
+            "name": "Aaron Klump",
+            "email": "sourcecode@intheloftstudios.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "AKlump\\WebPackage\\User\\": "src/",
+            "AKlump\\PhoneNumber\\": "../src/"
+        }
+    }
+}

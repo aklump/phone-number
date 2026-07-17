@@ -33,7 +33,7 @@ final class USPhoneNumberFormatter {
    *
    * @return void
    */
-  public function __construct(string $format_template = NULL, int $default_area_code = NULL, PhoneNumberModelInterface $phone_number_model = NULL) {
+  public function __construct(?string $format_template = NULL, ?int $default_area_code = NULL, ?PhoneNumberModelInterface $phone_number_model = NULL) {
     $this->areaCode = $default_area_code;
     $this->phoneNumberFormat = $format_template ?? PhoneNumberFormats::NANP;
     $this->phoneNumberModel = $phone_number_model ?? new USPhoneNumberModel();
