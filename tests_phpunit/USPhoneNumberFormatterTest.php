@@ -31,7 +31,7 @@ final class USPhoneNumberTest extends TestCase {
   /**
    * @dataProvider dataFortestIsValidReturnsTrueProvider
    */
-  public function testIsValidReturnsTrue($number, string $format = NULL) {
+  public function testIsValidReturnsTrue($number, ?string $format = NULL) {
     $phone = new USPhoneNumberFormatter($format);
     $this->assertTrue($phone->isValid($number));
   }
@@ -48,7 +48,7 @@ final class USPhoneNumberTest extends TestCase {
   /**
    * @dataProvider dataFortestIsValidReturnsFalseProvider
    */
-  public function testIsValidReturnsFalse($number, string $format = NULL) {
+  public function testIsValidReturnsFalse($number, ?string $format = NULL) {
     $phone = new USPhoneNumberFormatter($format);
     $this->assertFalse($phone->isValid($number));
   }
@@ -135,7 +135,7 @@ final class USPhoneNumberTest extends TestCase {
   /**
    * @dataProvider dataFortestInvokeProvider
    */
-  public function testFormat(string $expected, $subject, string $format = NULL) {
+  public function testFormat(string $expected, $subject, ?string $format = NULL) {
     $this->assertSame($expected, (new USPhoneNumberFormatter($format))->format($subject));
   }
 

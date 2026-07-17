@@ -1,2 +1,10 @@
 title: Book
 uuid: bf5f6356-0d20-4e3d-97e9-db8da61a8b94
+chapters:
+  -
+    id: general
+    title: General
+    pages:
+      - readme
+      - too_long
+      - changelog
